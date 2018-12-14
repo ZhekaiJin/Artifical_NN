@@ -1,4 +1,4 @@
-# PROJECT REPORT 
+# ANN implementation 
  
 #### Author : Zhekai Jin (Scott)
 #### Course : ECE 469 Artificial Intelligence
