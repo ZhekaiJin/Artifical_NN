@@ -1,8 +1,6 @@
-# ANN implementation 
+# ANN Implementation 
  
 #### Author : Zhekai Jin (Scott)
-#### Course : ECE 469 Artificial Intelligence
-#### Professor : Carl Sable 
 
 ## Description
    An implementation of Artificial Neural Network using C++.	
