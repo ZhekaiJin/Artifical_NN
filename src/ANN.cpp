@@ -49,6 +49,81 @@ double ANN::sigmoid_prime(double inputValue) {
 }
 
 int ANN::train(std::ifstream &training_data_file, double learning_rate, int epochs_num) {
+    int sets_num, input_num, output_num;
+    std::vector<training_sets> train_sets;
+
+    //load traning set
+    training_data_file >> sets_num >> input_num >> output_num;
+    train_sets.resize(sets_num);
+    for (int i = 0; i < sets_num; i++) {
+        train_sets[i].inputs.resize(input_num);
+        train_sets[i].outputs.resize(output_num);
+        for (int j=0; j < input_num; j++) {
+            training_data_file >> train_sets[i].inputs[j];
+        }
+        for (int j=0; j < output_num; j++) {
+            training_data_file >> train_sets[i].outputs[j];
+        }
+    }
+
+
+//  implementation of back propogation
+    int outputLayerIndex = this->numLayers - 1;
+    for (int epoch = 0; epoch < epochs_num; epoch++) {
+
+        for (int cur_set = 0; cur_set < sets_num; cur_set++) {
+
+            // Copy input vector of single training example to the input nodes of the network
+            for (int node_i=0; node_i<input_num; node_i++) {
+                this->layers[0][node_i+1].activation = train_sets[cur_set].inputs[node_i]; // Shifted by 1 due to bias input
+            }
+
+            // Propogate the inputs forward to compute the outputs
+            for (int layer_l = 1; layer_l<this->numLayers; layer_l++) {
+                for (int node_j = 1; node_j<this->layerSizes[layer_l]; node_j++) {
+                    this->layers[layer_l][node_j].inputValue = 0;
+                    std::vector<links>::iterator it;
+                    // Looping through all connections in previous layer to node j
+                    for (it=this->layers[layer_l][node_j].in_links.begin(); it!=this->layers[layer_l][node_j].in_links.end(); it++) {
+                        this->layers[layer_l][node_j].inputValue += it->weight * it->connectedNeuron->activation;
+                    }
+                    // Computing the sigmod of the jth node at layer l
+                    this->layers[layer_l][node_j].activation = this->sigmoid(this->layers[layer_l][node_j].inputValue);
+                }
+            }
+
+            // Propogate errors backward from output layer to input layer
+            for (int node_j=1; node_j<this->layerSizes[outputLayerIndex]; node_j++) { // for each node j in output layer
+                this->layers[outputLayerIndex][node_j].error =
+                        this->sigmoid_prime(this->layers[outputLayerIndex][node_j].inputValue) *
+                                                               (train_sets[cur_set].outputs[node_j-1] - this->layers[outputLayerIndex][node_j].activation);
+            }
+            for (int layer_l=outputLayerIndex-1; layer_l>0; layer_l--) {
+                for (int node_i=1; node_i<this->layerSizes[layer_l]; node_i++) {
+                    double sum = 0;
+                    std::vector<links>::iterator it;
+                    // Looping through all connections to layer l + 1
+                    for (it=this->layers[layer_l][node_i].out_links.begin(); it!=this->layers[layer_l][node_i].out_links.end(); it++) {
+                        sum += it->weight * it->connectedNeuron->error;
+                    }
+                    this->layers[layer_l][node_i].error =
+                            this->sigmoid_prime(this->layers[layer_l][node_i].inputValue) * sum;
+                }
+            }
+            for (int layer_l=1; layer_l<this->numLayers; layer_l++) {
+                for (int node_j=1; node_j<this->layerSizes[layer_l]; node_j++) {
+                    std::vector<links>::iterator it;
+                    // Looping through all connections in previous layer to node j
+                    for (it=this->layers[layer_l][node_j].in_links.begin(); it!=this->layers[layer_l][node_j].in_links.end(); it++) {
+                        // Update weights in both directions
+                        it->weight = it->weight + learning_rate * it->connectedNeuron->activation * this->layers[layer_l][node_j].error;
+                        it->connectedNeuron->out_links[node_j-1].weight = it->weight;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 int ANN::test(std::ifstream& test_data_file, std::ofstream& output_file) {
@@ -161,6 +236,8 @@ int ANN::test(std::ifstream& test_data_file, std::ofstream& output_file) {
     return 0;
 }
 
+
+
 void ANN::saveToFile(std::ostream &outputFile){
 
     outputFile << std::setprecision(3) << std::fixed;
@@ -187,4 +264,5 @@ void ANN::saveToFile(std::ostream &outputFile){
             outputFile << std::endl;
         }
     }
+
 }
