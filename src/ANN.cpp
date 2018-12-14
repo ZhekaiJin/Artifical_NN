@@ -53,4 +53,29 @@ int ANN::train(std::ifstream &training_data_file, double learning_rate, int epoc
 int ANN::test(std::ifstream& test_data_file, std::ofstream& output_file) {
 }
 void ANN::saveToFile(std::ostream &outputFile){
+
+    outputFile << std::setprecision(3) << std::fixed;
+
+    int outputLayerIndex = this->numLayers - 1;
+    for (int layer=0; layer<this->numLayers; layer++) {
+        if (layer != 0){
+            outputFile << " ";
+        }
+        outputFile << this->layerSizes[layer]-1;
+    }
+    outputFile << std::endl;
+    for (int layer_l=1; layer_l<this->numLayers; layer_l++) {
+        for (int node_j=1; node_j<this->layerSizes[layer_l]; node_j++) {
+            std::vector<links>::iterator it;
+            // Looping through all links in previous layer to node j [ a lot of them]
+            for (it=this->layers[layer_l][node_j].in_links.begin(); it!=this->layers[layer_l][node_j].in_links.end(); it++) {
+                // Print all the weights
+                if (it != this->layers[layer_l][node_j].in_links.begin()) {
+                    outputFile << " ";
+                }
+                outputFile << it->weight;
+            }
+            outputFile << std::endl;
+        }
+    }
 }
