@@ -3,7 +3,8 @@
 #### Author : Zhekai Jin (Scott)
 
 ## Description
-   An implementation of Artificial Neural Network using C++.	
+   An implementation of Artificial Neural Network using C++.	![](doc/ANN.jpg)
+
 
 ## Dependency 
 * CMAKE 3.0
@@ -19,14 +20,15 @@ Follow the Prompt
 ```	
 ## Build
 ```
-cd ANN_code/
+https://github.com/ZhekaiJin/Artifical_NN.git
+cd Artifical_NN/
 mkdir build && cd build
 cmake .. && make 
 ```	
 
 ## Clear Build
 ```
-cd ANN_code/
+cd Artifical_NN/
 rm -rf build
 ```	
 
