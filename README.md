@@ -3,7 +3,8 @@
 #### Author : Zhekai Jin (Scott)
 
 ## Description
-   An implementation of Artificial Neural Network using C++.	![](doc/ANN.jpg)
+   ![](doc/ANN.jpg)
+   *<br/>An implementation of Artificial Neural Network using C++.*
 
 
 ## Dependency 
